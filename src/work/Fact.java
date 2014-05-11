@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 public class Fact {
 	private String fact;
-	public int a;
 	
 	/**
 	 * constructor*/
