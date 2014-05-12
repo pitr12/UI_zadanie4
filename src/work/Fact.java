@@ -1,5 +1,8 @@
 package work;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 
 public class Fact {
@@ -28,19 +31,19 @@ public class Fact {
 	}
 	
 	/**
-	 * create facts*/
-	public static void createFacts(){
-	Production.facts.add(new Fact("Peter je rodic Jano"));
-	Production.facts.add(new Fact("Peter je rodic Vlado"));
-	Production.facts.add(new Fact("manzelia Peter Eva"));
-	Production.facts.add(new Fact("Vlado je rodic Maria"));
-	Production.facts.add(new Fact("Vlado je rodic Viera"));
-	Production.facts.add(new Fact("muz Peter"));
-	Production.facts.add(new Fact("muz Jano"));
-	Production.facts.add(new Fact("muz Vlado"));
-	Production.facts.add(new Fact("zena Maria"));
-	Production.facts.add(new Fact("zena Viera"));
-	Production.facts.add(new Fact("zena Eva"));
+	 * load facts*/
+	public static void loadFacts(){
+		BufferedReader reader;
+		try{
+	        reader = new BufferedReader(new FileReader(new File("family_facts.txt")));
+	        String line = null;
+	        while ((line = reader.readLine()) != null) {
+	        	Production.facts.add(new Fact(line));
+	        }
+        }
+        catch (Exception e){
+        	e.printStackTrace();
+        }
 	}
 	
 	public static void printFacts(){
@@ -57,5 +60,13 @@ public class Fact {
 				return true;
 		}
 		return false;
+	}
+	
+	public static int factPosition(String fact){
+		for(int i=0; i<Production.facts.size(); i++){
+			if(Production.facts.get(i).getFact().equals(fact))
+				return i;
+		}
+		return 0;
 	}
 }

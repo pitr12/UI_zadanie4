@@ -1,5 +1,8 @@
 package work;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,61 +52,44 @@ public class Rule {
 	}
 	
 	/**
-	 * create rules*/
-	
-	public static void createRules(){
-		ArrayList<String> statement = new ArrayList<String>();
-		ArrayList<String> action = new ArrayList<String>();
-
-		statement.add("?X je rodic ?Y");
-		statement.add("manzelia ?X ?Z");
-		action.add("pridaj ?Z je rodic ?Y");
-		Production.rules.add(new Rule("DruhyRodic1", statement , action));
-		
-		statement.clear();
-		action.clear();
-		statement.add("?X je rodic ?Y");
-		statement.add("manzelia ?Z ?X");
-		action.add("pridaj ?Z je rodic ?Y");
-		Production.rules.add(new Rule("DruhyRodic2", statement , action));
-		
-		
-		statement.clear();
-		action.clear();
-		statement.add("?X je rodic ?Y");
-		statement.add("muz ?X");
-		action.add("pridaj ?X je otec ?Y");
-		Production.rules.add(new Rule("Otec", statement , action));
-		
-		statement.clear();
-		action.clear();
-		statement.add("?X je rodic ?Y");
-		statement.add("zena ?X");
-		action.add("pridaj ?X je matka ?Y");
-		Production.rules.add(new Rule("Matka", statement , action));
-		
-		statement.clear();
-		action.clear();
-		statement.add("?X je rodic ?Y");
-		statement.add("?X je rodic ?Z");
-		statement.add("<> ?Y ?Z");
-		action.add("pridaj ?Y a ?Z su surodenci");
-		Production.rules.add(new Rule("Surodenci", statement , action));
-		
-		statement.clear();
-		action.clear();
-		statement.add("?Y a ?Z su surodenci");
-		statement.add("muz ?Y");
-		action.add("pridaj ?Y je brat ?Z");
-		Production.rules.add(new Rule("Brat", statement , action));
-		
-		statement.clear();
-		action.clear();
-		statement.add("?Y je brat ?Z");
-		statement.add("?Z je rodic ?X");
-		action.add("pridaj ?Y je stryko ?X");
-		Production.rules.add(new Rule("Stryko", statement , action));
+	 * load rules*/
+	public static void loadRules(){
+		BufferedReader reader;
+		try{
+	        reader = new BufferedReader(new FileReader(new File("family_rules.txt")));
+	        String line = null;
+	        while ((line = reader.readLine()) != null) {
+	        	String name = line;
+	        	line = reader.readLine();
+	        	String statements = line;
+	        	line = reader.readLine();
+	        	String actions = line;
+	        	line = reader.readLine();
+	        	String[] name_n = name.split(" ");
+	        	String[] statements_n = statements.split("\t");
+	        	String[] actions_n = actions.split("\t");
+	        	
+	        	ArrayList<String> statement = new ArrayList<String>();
+	    		ArrayList<String> action = new ArrayList<String>();
+	    		
+	    		String[] statements_n2 = statements_n[1].split(",");
+	    		for(int i=0; i<statements_n2.length; i++){
+	    			statement.add(statements_n2[i]);
+	    		}
+	    		
+	    		String[] actions_n2 = actions_n[1].split(",");
+	    		for(int i=0; i<actions_n2.length; i++){
+	    			action.add(actions_n2[i]);
+	    		}
+	    		
+	    		Production.rules.add(new Rule(name_n[1], statement , action));
+	        }
+        }
+        catch (Exception e){
+        	e.printStackTrace();
+        }
 	}
+	
 	
 	public static void printRules(){
 		for(Rule r: Production.rules){
@@ -119,7 +105,9 @@ public class Rule {
 			if(s.matches("^<>.+"))
 				this.specialRule = true;
 			else{
-				String nstring = s.replaceAll("\\?[A-Z]{1}", "[A-Za-z]+");
+				System.out.println("s:\t" +s);
+				String nstring = s.replaceAll("\\?[^\\s]+", "[A-Za-z]+");
+				System.out.println("nstring:\t" +nstring);
 				this.regex_statement.set(counter, nstring);	
 				counter++;
 			}
@@ -313,19 +301,28 @@ public class Rule {
 	public static boolean performAction(){
 		for(String action: Production.actions){
 			String [] split = action.split(" ");
+			
+			String new_fact = "";
+			for(int j=1; j<split.length; j++){
+				if(j == split.length -1)
+					new_fact += split[j];
+				else
+					new_fact += split[j] + " "; 
+			}
+			
 			switch(split[0]){
 			case "pridaj":
-				String new_fact = "";
-				for(int j=1; j<split.length; j++){
-					if(j == split.length -1)
-						new_fact += split[j];
-					else
-						new_fact += split[j] + " "; 
-				}
 				if(!Fact.containsFact(new_fact)){
 					Production.facts.add(new Fact(new_fact));
 					return true;
 				}
+				break;
+			case "vymaz":
+				if(Fact.containsFact(new_fact)){
+					Production.facts.remove(Fact.factPosition(new_fact));
+				}
+				break;
+			case "sprava":
 				break;
 			}
 		}

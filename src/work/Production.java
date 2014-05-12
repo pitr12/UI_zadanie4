@@ -10,16 +10,17 @@ public class Production {
 	
 	public static void main(String[] args) {	
 		
-		/**
-		 * create facts*/
-		Fact.createFacts();
+		
 		
 		/**
-		 * create rules*/
-		Rule.createRules();
+		 * load facts*/
+		Fact.loadFacts();
 		
-		Fact.printFacts();
-		Rule.printRules();
+		/**
+		 * load rules*/
+		Rule.loadRules();
+		
+		
 		
 		/**
 		 * convert rule statements into regex expressions*/
