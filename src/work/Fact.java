@@ -1,5 +1,7 @@
 package work;
 
+import gui.UI;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -44,11 +46,13 @@ public class Fact {
         catch (Exception e){
         	e.printStackTrace();
         }
+		Fact.printFacts();
 	}
 	
 	public static void printFacts(){
+		UI.textArea.setText("");
 		for(Fact f: Production.facts){
-			System.out.println(f.getFact());
+			UI.textArea.append(f.getFact() + "\n");
 		}
 	}
 	

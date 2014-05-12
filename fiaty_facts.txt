@@ -1,5 +1,0 @@
-typ karoserie sedan
-pocet dveri 4
-pohanana naprava predna
-predna maska mriezka
-ma okruhle svetla

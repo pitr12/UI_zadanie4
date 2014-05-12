@@ -1,5 +1,8 @@
 package work;
 
+import gui.UI;
+
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -8,6 +11,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
 
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import javax.swing.text.html.HTMLDocument.Iterator;
 
 public class Rule {
@@ -88,11 +95,21 @@ public class Rule {
         catch (Exception e){
         	e.printStackTrace();
         }
+		Rule.printRules();
 	}
 	
 	
 	public static void printRules(){
+		UI.textArea_1.setText("");
 		for(Rule r: Production.rules){
+			UI.textArea_1.append("Meno: " +r.getName() +"\n");
+			UI.textArea_1.append("AK: " +r.getStatement() +"\n");
+			UI.textArea_1.append("POTOM: " +r.getAction() +"\n");
+			UI.textArea_1.append("\n");
+			
+			
+			
+			UI.textArea_1.setCaretPosition(0);
 			System.out.println(r.getName() + ": " +r.getRegexStatement() + " => " +r.getAction());
 		}
 	}
@@ -105,9 +122,7 @@ public class Rule {
 			if(s.matches("^<>.+"))
 				this.specialRule = true;
 			else{
-				System.out.println("s:\t" +s);
 				String nstring = s.replaceAll("\\?[^\\s]+", "[A-Za-z]+");
-				System.out.println("nstring:\t" +nstring);
 				this.regex_statement.set(counter, nstring);	
 				counter++;
 			}
@@ -314,19 +329,52 @@ public class Rule {
 			case "pridaj":
 				if(!Fact.containsFact(new_fact)){
 					Production.facts.add(new Fact(new_fact));
+					Rule.printAction(new_fact);
+					
+					StyledDocument doc = UI.textPane.getStyledDocument();
+					Style style = UI.textPane.addStyle("I'm a Style", null);
+					Color color = new Color(0,205,0);
+			        StyleConstants.setForeground(style, color);
+			        try { doc.insertString(doc.getLength(), " ",style); }
+			        catch (BadLocationException e){}
+					UI.textPane.setText("Adding: " +new_fact);
+					UI.textPane.update(UI.textPane.getGraphics());
+					
 					return true;
 				}
 				break;
 			case "vymaz":
 				if(Fact.containsFact(new_fact)){
 					Production.facts.remove(Fact.factPosition(new_fact));
+					Fact.printFacts();
+					
+					StyledDocument doc = UI.textPane.getStyledDocument();
+					Style style = UI.textPane.addStyle("I'm a Style", null);
+					Color color = new Color(255,0,0);
+			        StyleConstants.setForeground(style, color);
+			        try { doc.insertString(doc.getLength(), " ",style); }
+			        catch (BadLocationException e){}
+					UI.textPane.setText("Removing: " +new_fact);
+					UI.textPane.update(UI.textPane.getGraphics());
 				}
-				break;
-			case "sprava":
 				break;
 			}
 		}
 		return false;
+	}
+	
+	public static void printAction(String action){
+		System.out.println(action);
+		UI.textArea.append(action + "\n");
+		
+		try {
+		    Thread.sleep(300);
+		} catch(InterruptedException ex) {
+		    Thread.currentThread().interrupt();
+		}
+		UI.textArea.setCaretPosition(UI.textArea.getText().length());
+		UI.textArea.update(UI.textArea.getGraphics());
+		
 	}
 }
 
